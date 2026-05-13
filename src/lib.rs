@@ -2,6 +2,9 @@
 //!
 //! This crate provides the core Rust implementation for CocoIndex,
 //! exposing Python bindings via PyO3.
+//!
+//! Personal fork: studying the pipeline and transform modules for
+//! a custom document indexing use case.
 
 use pyo3::prelude::*;
 
