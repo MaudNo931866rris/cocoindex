@@ -8,6 +8,10 @@
 //!
 //! NOTE: I'm primarily interested in the transform module for
 //! experimenting with custom chunking strategies for legal documents.
+//!
+//! Fork notes (personal):
+//! - Looking into `transform::splitter` for sentence-boundary-aware chunking
+//! - Legal docs often have numbered clauses; standard splitters miss these
 
 use pyo3::prelude::*;
 
@@ -35,6 +39,7 @@ fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Register transform operations
     // TODO: explore adding a custom legal document splitter here
+    // TODO: check if transform::register exposes chunk_size param — want to default to 512 for legal docs
     transform::register(m)?;
 
     Ok(())
