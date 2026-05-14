@@ -5,6 +5,9 @@
 //!
 //! Personal fork: studying the pipeline and transform modules for
 //! a custom document indexing use case.
+//!
+//! NOTE: I'm primarily interested in the transform module for
+//! experimenting with custom chunking strategies for legal documents.
 
 use pyo3::prelude::*;
 
@@ -31,6 +34,7 @@ fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     storage::register(m)?;
 
     // Register transform operations
+    // TODO: explore adding a custom legal document splitter here
     transform::register(m)?;
 
     Ok(())
