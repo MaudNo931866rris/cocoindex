@@ -16,6 +16,8 @@
 //!   it's set per-operation. Will wire up a default of 512 in the Python wrapper instead.
 //! - Bumped DEFAULT_LEGAL_CHUNK_SIZE from 512 -> 768 after testing on a larger
 //!   sample of contracts; 512 was cutting through multi-part clause definitions.
+//! - Added DEFAULT_LEGAL_CHUNK_OVERLAP: 10% of chunk size (76 tokens) to preserve
+//!   cross-boundary context for clause references like "as defined in section X above".
 
 use pyo3::prelude::*;
 
@@ -31,6 +33,12 @@ pub mod utils;
 /// which hurt retrieval quality for clause-level queries.
 const DEFAULT_LEGAL_CHUNK_SIZE: usize = 768;
 
+/// Default overlap between consecutive chunks, in tokens.
+/// Set to ~10% of DEFAULT_LEGAL_CHUNK_SIZE to retain cross-boundary context
+/// without bloating index size too much. Adjust if retrieval still misses
+/// references that span chunk boundaries.
+const DEFAULT_LEGAL_CHUNK_OVERLAP: usize = 76;
+
 /// Python module initialization
 /// Registers all Python-accessible classes and functions
 #[pymodule]
@@ -40,6 +48,9 @@ fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Expose default chunk size so the Python wrapper can read it
     m.add("DEFAULT_LEGAL_CHUNK_SIZE", DEFAULT_LEGAL_CHUNK_SIZE)?;
+
+    // Expose default chunk overlap for the Python wrapper
+    m.add("DEFAULT_LEGAL_CHUNK_OVERLAP", DEFAULT_LEGAL_CHUNK_OVERLAP)?;
 
     // Register core indexing functions
     indexing::register(m)?;
