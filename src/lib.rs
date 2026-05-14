@@ -14,6 +14,8 @@
 //! - Legal docs often have numbered clauses; standard splitters miss these
 //! - Confirmed: transform::register does NOT expose chunk_size at the module level;
 //!   it's set per-operation. Will wire up a default of 512 in the Python wrapper instead.
+//! - Bumped DEFAULT_LEGAL_CHUNK_SIZE from 512 -> 768 after testing on a larger
+//!   sample of contracts; 512 was cutting through multi-part clause definitions.
 
 use pyo3::prelude::*;
 
@@ -24,9 +26,10 @@ pub mod transform;
 pub mod utils;
 
 /// Default chunk size for legal document processing.
-/// Standard splitters tend to cut mid-clause; 512 tokens keeps most
-/// numbered clauses intact based on my test corpus.
-const DEFAULT_LEGAL_CHUNK_SIZE: usize = 512;
+/// Raised to 768 tokens after empirical testing on contract corpus (~200 docs).
+/// 512 was splitting numbered sub-clauses (e.g. 3.1.a / 3.1.b) across chunks,
+/// which hurt retrieval quality for clause-level queries.
+const DEFAULT_LEGAL_CHUNK_SIZE: usize = 768;
 
 /// Python module initialization
 /// Registers all Python-accessible classes and functions
