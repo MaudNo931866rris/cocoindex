@@ -12,6 +12,8 @@
 //! Fork notes (personal):
 //! - Looking into `transform::splitter` for sentence-boundary-aware chunking
 //! - Legal docs often have numbered clauses; standard splitters miss these
+//! - Confirmed: transform::register does NOT expose chunk_size at the module level;
+//!   it's set per-operation. Will wire up a default of 512 in the Python wrapper instead.
 
 use pyo3::prelude::*;
 
@@ -21,12 +23,20 @@ pub mod storage;
 pub mod transform;
 pub mod utils;
 
+/// Default chunk size for legal document processing.
+/// Standard splitters tend to cut mid-clause; 512 tokens keeps most
+/// numbered clauses intact based on my test corpus.
+const DEFAULT_LEGAL_CHUNK_SIZE: usize = 512;
+
 /// Python module initialization
 /// Registers all Python-accessible classes and functions
 #[pymodule]
 fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Register version info
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
+
+    // Expose default chunk size so the Python wrapper can read it
+    m.add("DEFAULT_LEGAL_CHUNK_SIZE", DEFAULT_LEGAL_CHUNK_SIZE)?;
 
     // Register core indexing functions
     indexing::register(m)?;
@@ -38,8 +48,6 @@ fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     storage::register(m)?;
 
     // Register transform operations
-    // TODO: explore adding a custom legal document splitter here
-    // TODO: check if transform::register exposes chunk_size param — want to default to 512 for legal docs
     transform::register(m)?;
 
     Ok(())
