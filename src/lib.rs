@@ -24,6 +24,9 @@
 //! - Bumped DEFAULT_LEGAL_CHUNK_SIZE from 768 -> 896 after running evals on a set of
 //!   NDA templates; 768 still split recital blocks mid-sentence in longer preambles.
 //!   Will re-evaluate if memory usage becomes an issue in the embedding step.
+//! - Bumped DEFAULT_LEGAL_CHUNK_OVERLAP from 96 -> 112 after a second pass on the
+//!   NDA eval set; exhibit refs still occasionally clipped at 96. ~12.5% of 896 = 112.
+//!   Keeping it at an even number for readability.
 
 use pyo3::prelude::*;
 
@@ -41,10 +44,10 @@ pub mod utils;
 const DEFAULT_LEGAL_CHUNK_SIZE: usize = 896;
 
 /// Default overlap between consecutive chunks, in tokens.
-/// Raised from 76 -> 96 (~12.5% of chunk size) after observing that exhibit
+/// Raised from 76 -> 96 -> 112 (~12.5% of chunk size) after observing that exhibit
 /// cross-references were landing at chunk boundaries in the test corpus.
 /// Adjust down again if index storage becomes a concern.
-const DEFAULT_LEGAL_CHUNK_OVERLAP: usize = 96;
+const DEFAULT_LEGAL_CHUNK_OVERLAP: usize = 112;
 
 /// Python module initialization
 /// Registers all Python-accessible classes and functions
@@ -60,16 +63,4 @@ fn _cocoindex_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("DEFAULT_LEGAL_CHUNK_OVERLAP", DEFAULT_LEGAL_CHUNK_OVERLAP)?;
 
     // Register core indexing functions
-    indexing::register(m)?;
-
-    // Register pipeline components
-    pipeline::register(m)?;
-
-    // Register storage backends
-    storage::register(m)?;
-
-    // Register transform operations
-    transform::register(m)?;
-
-    Ok(())
-}
+    i
