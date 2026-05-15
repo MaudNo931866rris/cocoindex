@@ -18,6 +18,9 @@
 //!   sample of contracts; 512 was cutting through multi-part clause definitions.
 //! - Added DEFAULT_LEGAL_CHUNK_OVERLAP: 10% of chunk size (76 tokens) to preserve
 //!   cross-boundary context for clause references like "as defined in section X above".
+//! - Bumped DEFAULT_LEGAL_CHUNK_OVERLAP from 76 -> 96 after noticing that exhibit
+//!   references (e.g. "Exhibit A attached hereto") frequently fell right at chunk
+//!   boundaries in the test corpus. ~12.5% overlap feels like a better baseline.
 
 use pyo3::prelude::*;
 
@@ -34,10 +37,10 @@ pub mod utils;
 const DEFAULT_LEGAL_CHUNK_SIZE: usize = 768;
 
 /// Default overlap between consecutive chunks, in tokens.
-/// Set to ~10% of DEFAULT_LEGAL_CHUNK_SIZE to retain cross-boundary context
-/// without bloating index size too much. Adjust if retrieval still misses
-/// references that span chunk boundaries.
-const DEFAULT_LEGAL_CHUNK_OVERLAP: usize = 76;
+/// Raised from 76 -> 96 (~12.5% of chunk size) after observing that exhibit
+/// cross-references were landing at chunk boundaries in the test corpus.
+/// Adjust down again if index storage becomes a concern.
+const DEFAULT_LEGAL_CHUNK_OVERLAP: usize = 96;
 
 /// Python module initialization
 /// Registers all Python-accessible classes and functions
