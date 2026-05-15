@@ -21,6 +21,9 @@
 //! - Bumped DEFAULT_LEGAL_CHUNK_OVERLAP from 76 -> 96 after noticing that exhibit
 //!   references (e.g. "Exhibit A attached hereto") frequently fell right at chunk
 //!   boundaries in the test corpus. ~12.5% overlap feels like a better baseline.
+//! - Bumped DEFAULT_LEGAL_CHUNK_SIZE from 768 -> 896 after running evals on a set of
+//!   NDA templates; 768 still split recital blocks mid-sentence in longer preambles.
+//!   Will re-evaluate if memory usage becomes an issue in the embedding step.
 
 use pyo3::prelude::*;
 
@@ -31,10 +34,11 @@ pub mod transform;
 pub mod utils;
 
 /// Default chunk size for legal document processing.
-/// Raised to 768 tokens after empirical testing on contract corpus (~200 docs).
+/// Raised to 896 tokens after empirical testing on NDA templates and contract corpus.
+/// 768 was still splitting recital blocks mid-sentence in longer preambles.
 /// 512 was splitting numbered sub-clauses (e.g. 3.1.a / 3.1.b) across chunks,
 /// which hurt retrieval quality for clause-level queries.
-const DEFAULT_LEGAL_CHUNK_SIZE: usize = 768;
+const DEFAULT_LEGAL_CHUNK_SIZE: usize = 896;
 
 /// Default overlap between consecutive chunks, in tokens.
 /// Raised from 76 -> 96 (~12.5% of chunk size) after observing that exhibit
